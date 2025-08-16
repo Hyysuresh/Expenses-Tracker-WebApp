@@ -1,0 +1,47 @@
+version: "3.8"
+
+
+services:
+  java:
+    build:
+      context: .
+    container_name: expenseapp
+    environment:
+      SPRING_DATASOURCE_USRENAME: root
+      SPRING_DATASOURCE_PASSWORD: spring@123
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/expenses_tracker?allowPublicKeyRetrieval=true&useSSL=false"
+
+    ports:
+      - "8080"
+    networks:
+      - appbridge
+    depends_on:
+      - mysql
+    restart: always
+
+  mysql:
+    image: mysql
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: spring@123
+      MYSQL_DATABASE: expenses_tracker
+    healthcheck:
+      test: ["CMD", "mysqladmin","ping", "-h", "localhost", "-uroot", "-pspring@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    networks:
+      - appbridge
+    ports:
+      - "3306:3306"
+
+networks:
+  appbridge:
+volumes:
+  mysql-data:
+
+
